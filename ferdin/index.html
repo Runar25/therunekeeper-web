@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Rúnar · Gakktu með Rúnari</title>
+<!-- 2026-10-19 CODE-web: stránka „The journey with Rúnar“ (DECISIONS 2026-10-19 (7)). Od 2026-10-21 na therunekeeper.com/ferdin/,
+     zatím SKRYTÁ (noindex, bez odkazu z landingu) — owner ji chce vyladit naostro, než se spustí.
+     Verze 4 (týž den). v1 = vlastní vzhled, účty vedle sebe, kameny na čárkované cestě („grafika neodpovídá tomu, co je Rúnar“);
+     v2 = celé ze tříd appky pod sebou s portrétem („moc dlouhá, Rúnar se tam nevleze“); v3 = v1 v kartách appky, kámen na rámečku
+     („ty kameny se ti fakt nepovedly… líbila se mi první verze, tohle je hybrid“). → Tady v1 beze změny rozložení (bez karet, kameny
+     na cestě), z appky jen pozadí a horní lišta (živý runar-reader.css: body::before, .topbar) a tokeny barev. Vlastní třídy mají
+     předponu j-, ať se nepletou se třídami appky. Cesta mezi kameny je z kousků MEZI kameny — v3 kryla čáru krabičkou v barvě pozadí,
+     která na přechodu pozadí appky byla vidět.
+     Značky účtů (DECISIONS 2026-10-19 (8)) a texty (UI_TEXT journey_*, IS sada CODE-read) bere z appky: kamenUctuSvg / kamenUctuVystred
+     v runar-utils.js (CODE-tune), bez pohybu (owner schválil pohyb jen pro „you are here“ v appce). Výpis = tierFeatures(), TIERS, CARD_PACKS.
+     Appku načítá z živé adresy jako landing (do 2026-10-21 byl náhled ve web/nahled/ a četl pracovní strom).
+     Nová věta jen J_CARD (sekce karty; IS ověřena Greynirem a korpusem 2026-10-19). journey_web_note a druhá věta journey_card_note
+     jsou jen pro appku (CODE-read) — web je nepoužívá.
+     2026-10-20 (owner): záložka Rúnakort = volitelné dlaždice balíčků + velký náhled karty (vzhled a balíček), kresba karty sdílená
+     s /kort/ (../runakort.css|js); „Coming soon“ u účtů pryč; tlačítka = .btn-upgrade appky, všechna stejně široká.
+     Ceny předplatného z configu: TIERS.*.price_isk_month / price_isk_year (do 2026-10-19 tu byla dočasná kopie z RUNAR_PRICING). -->
+<link rel="stylesheet" href="https://runar25.github.io/Runar-admin/v2/fonts/fonts.css">
+<link rel="stylesheet" href="https://runar25.github.io/Runar-admin/v2/runar-reader.css">
+<link rel="stylesheet" href="../runakort.css">
+<style>
+.j-lang button{font-family:'Cinzel',serif;font-size:0.72em;letter-spacing:3px;background:none;border:none;color:var(--gold);opacity:.5;cursor:pointer;margin-left:14px}
+.j-lang button.on{opacity:.9}
+.j-page{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:44px 40px 60px}
+.j-eyebrow{font-family:'Cinzel',serif;font-size:14px;letter-spacing:5px;color:var(--gold);text-align:center;margin-bottom:12px}
+.j-sub{font-style:italic;color:var(--muted);font-size:22px;text-align:center;max-width:32em;margin:0 auto 30px;line-height:1.5}
+.j-per{display:flex;justify-content:center;gap:26px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;margin-bottom:40px}
+.j-per span{cursor:pointer;color:var(--muted);padding-bottom:4px}
+.j-per span.on{color:var(--gold);border-bottom:1px solid var(--gold)}
+.j-path{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.j-st{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center}
+/* kousek cesty od tohoto kamene k dalšímu: od pravého okraje kamene přes mezeru k levému okraji dalšího */
+.j-st:not(:last-child)::after{content:"";position:absolute;top:36px;left:calc(50% + 34px);width:calc(100% + 22px - 68px);border-top:1px dashed var(--border)}
+.j-stone{width:52px;height:72px;margin-bottom:14px}
+.j-stone svg{width:100%;height:100%;display:block;overflow:visible}
+.j-nm{font-family:'Cinzel',serif;font-size:15px;letter-spacing:3px;color:var(--white);margin-bottom:6px}
+.j-pr{font-size:24px;color:var(--gold);min-height:1.5em}
+.j-pr small{font-size:16px;color:var(--muted)}
+.j-gift{font-style:italic;color:var(--ember, #D6A85C);font-size:16px;min-height:1.4em}
+.j-ft{list-style:none;font-size:17px;color:#c9d6e3;line-height:1.45;margin:12px 0 16px;max-width:15em}
+.j-ft li{margin-bottom:6px}
+/* tlačítka účtů = .btn-upgrade appky; stejná šířka všech, text na jeden řádek */
+.j-st .btn-upgrade{margin-top:auto;width:100%;max-width:250px;white-space:nowrap}
+.j-card{text-align:center}
+.j-card p{font-style:italic;color:var(--muted);margin-bottom:22px}
+/* dlaždice balíčků: volitelné, zvolená svítí zlatě (tón .pill.on appky) */
+.j-packs{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:760px;margin:0 auto}
+.j-pk{border:1px solid var(--border);background:transparent;padding:14px 8px 12px;cursor:pointer;transition:all .2s;font:inherit;color:inherit}
+.j-pk:hover{border-color:var(--border2)}
+.j-pk.on{border-color:var(--gold);background:var(--gold2)}
+.j-pk .n{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--gold);opacity:.85}
+.j-pk .c{font-family:'Cinzel',serif;font-size:30px;color:var(--white);line-height:1.1;margin-top:8px}
+.j-pk .u{font-style:italic;color:var(--muted);font-size:15px}
+.j-pk .p{color:var(--gold);font-size:19px;margin-top:6px}
+/* velký náhled karty pod dlaždicemi */
+.j-preview{margin:34px auto 0;display:flex;flex-direction:column;align-items:center;gap:18px}
+.j-preview .rk-wrap{width:520px}
+.j-des{display:flex;gap:22px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px}
+.j-des span{cursor:pointer;color:var(--muted);padding-bottom:4px}
+.j-des span.on{color:var(--gold);border-bottom:1px solid var(--gold)}
+.j-foot{border-top:1px solid rgba(46,74,112,0.4);margin-top:50px;padding-top:16px;text-align:center;font-style:italic;color:var(--muted);font-size:16px}
+@media(max-width:760px){
+  .j-page{padding:22px 16px 40px}
+  .j-path{grid-template-columns:1fr;gap:0}
+  .j-st{display:grid;grid-template-columns:52px 1fr;column-gap:14px;text-align:left;align-items:start;padding-bottom:26px}
+  .j-st:not(:last-child)::after{top:80px;left:26px;width:0;bottom:4px;border-top:none;border-left:1px dashed var(--border)}
+  .j-stone{grid-row:span 6;margin:0}
+  .j-ft{max-width:none}
+  .j-st .btn-upgrade{justify-self:start}
+  .j-packs{grid-template-columns:repeat(2,1fr)}
+  .j-pk{min-width:0}
+  .j-pk .n{letter-spacing:1.5px}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="/">AGNDOFA</a>
+  <span class="j-lang"><button data-l="is">IS</button><button data-l="en">EN</button></span>
+</div></header>
+<div class="j-page">
+  <div class="j-eyebrow" data-k="journey_title"></div>
+  <p class="j-sub" id="j-sub"></p>
+  <div class="j-per" id="per"><span data-p="m" class="on" data-k="journey_monthly"></span><span data-p="y" data-k="journey_yearly"></span><span data-p="k" id="per-k"></span></div>
+  <div class="j-path" id="path"></div>
+  <section class="j-card" id="cardsec" style="display:none">
+    <p id="card-p"></p>
+    <div class="j-packs" id="packs"></div>
+    <div class="j-preview"><div class="j-des" id="des"></div><div class="rk-wrap" id="preview"></div></div>
+  </section>
+  <div class="j-foot" data-k="journey_foot"></div>
+</div>
+
+<script src="https://runar25.github.io/Runar-admin/v2/runar-config.js"></script>
+<script src="https://runar25.github.io/Runar-admin/v2/runar-runes.js"></script>
+<script src="https://runar25.github.io/Runar-admin/v2/runar-translations.js"></script>
+<script src="https://runar25.github.io/Runar-admin/v2/runar-svgs.js"></script>
+<script src="https://runar25.github.io/Runar-admin/v2/runar-utils.js"></script>
+<script src="../runakort.js"></script>
+<script>
+// Jediná nová věta stránky (sekce karty); IS ověřena 2026-10-19: Greynir OK, „rennur aldrei út“ 37×, „kaupa handa“ 2957×, „gefðu það“ 43×.
+var J_CARD = { en: 'No subscription, and the card never expires. Buy it for yourself, or give it to someone.',
+               is: 'Engin áskrift og kortið rennur aldrei út. Kauptu það handa þér eða gefðu það öðrum.' };
+var LANG = 'is', P = 'm';
+var PK = 1, DES = 'o';   // zvolený balíček (index v CARD_PACKS) a vzhled karty (RK_DESIGNS)
+var lang = LANG;   // pro t()/tp() z runar-utils.js
+var ORDER = ['free_trial', 'rune_seeker', 'standard', 'premium'];
+function cislo(x) { return x.toLocaleString('de-DE'); }   // tečka na tisíce (1.490), jednotku nese text UI_TEXT
+function jmeno(T) { return (LANG === 'is' ? T.label_is : T.label.replace(/^Rune\s+/, '')).toUpperCase(); }
+function draw() {
+  var U = UI_TEXT[LANG];
+  document.getElementById('path').innerHTML = ORDER.map(function (id) {
+    var T = TIERS[id], m = T.price_isk_month, y = T.price_isk_year;
+    var h = '<div class="j-st"><div class="j-stone">' + kamenUctuSvg(id) + '</div><div class="j-nm">' + jmeno(T) + '</div>';
+    if (m) {
+      h += P === 'm' ? '<div class="j-pr">' + tp('journey_price_m', { price: cislo(m) }) + '</div><div class="j-gift"></div>'
+                     : '<div class="j-pr">' + tp('journey_price_y', { price: cislo(Math.round(y / 12)), year: cislo(y) }) + '</div><div class="j-gift">' + U.journey_gift + '</div>';
+    } else {
+      // zdarma jen Visitor a Rune Seeker jmenovitě — placený účet bez načtené ceny nesmí ukázat „zdarma“ (owner 2026-10-19)
+      h += '<div class="j-pr"><small>' + ({ free_trial: U.journey_free, rune_seeker: U.journey_free_join }[id] || '') + '</small></div><div class="j-gift"></div>';
+    }
+    var f = id === 'free_trial' ? [U.journey_visitor_ft] : tierFeatures(id, LANG);
+    h += '<ul class="j-ft">' + f.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
+    if (m) h += '<button class="btn-upgrade">' + tp('journey_walk_on', { tier: jmeno(T) }) + '</button>';
+    else if (id === 'rune_seeker') h += '<button class="btn-upgrade" data-go="k">' + vl('card', LANG).toUpperCase() + ' →</button>';
+    return h + '</div>';
+  }).join('');
+  kamenUctuVystred(document.getElementById('path'));   // bez živého účtu = bez pohybu
+  document.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { setP(b.getAttribute('data-go')); }; });
+}
+// Záložka Rúnakort: dlaždice balíčků (volba) + vzhled + velký náhled líce karty, kreslený stejně jako /kort/ (runakort.js)
+function karta() {
+  document.getElementById('packs').innerHTML = CARD_PACKS.map(function (p, i) {
+    // „10“ velké a „spár“ pod ním: jednotka z vn() bez čísla, ať se plurál bere z VOCAB
+    var jedn = vn('cast', p.credits, LANG).replace(/^\d+\s*/, '');
+    return '<button class="j-pk' + (i === PK ? ' on' : '') + '" data-pk="' + i + '"><div class="n">' + cardPackName(p, LANG).toUpperCase() + '</div><div class="c">' + p.credits
+      + '</div><div class="u">' + jedn + '</div><div class="p">' + cislo(p.isk) + ' kr</div></button>';
+  }).join('');
+  document.getElementById('des').innerHTML = Object.keys(RK_DESIGNS).map(function (k) {
+    return '<span data-des="' + k + '" class="' + (k === DES ? 'on' : '') + '">' + RK_DESIGNS[k][LANG].toUpperCase() + '</span>';
+  }).join('');
+  document.getElementById('preview').innerHTML = rkFront({ design: DES, lang: LANG, credits: CARD_PACKS[PK].credits });
+  document.querySelectorAll('[data-pk]').forEach(function (b) { b.onclick = function () { PK = +b.getAttribute('data-pk'); karta(); }; });
+  document.querySelectorAll('[data-des]').forEach(function (b) { b.onclick = function () { DES = b.getAttribute('data-des'); karta(); }; });
+}
+// Přepínač: m / y = cesta s cenami, k = balíčky Rúnakortu místo cesty
+function setP(p) {
+  P = p;
+  document.querySelectorAll('#per span').forEach(function (x) { x.classList.toggle('on', x.dataset.p === P); });
+  document.getElementById('path').style.display = P === 'k' ? 'none' : '';
+  document.getElementById('cardsec').style.display = P === 'k' ? '' : 'none';
+  if (P !== 'k') draw();
+}
+function render() {
+  lang = LANG;
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-k]').forEach(function (el) { el.textContent = UI_TEXT[LANG][el.getAttribute('data-k')] || ''; });
+  document.querySelectorAll('.j-lang button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-l') === LANG); });
+  document.getElementById('j-sub').textContent = tp('journey_sub', { casts: vlp('cast', LANG) });
+  document.getElementById('per-k').textContent = vl('card', LANG).toUpperCase();
+  document.getElementById('card-p').textContent = J_CARD[LANG];
+  karta();
+  draw();
+  setP(P);
+}
+document.querySelectorAll('.j-lang button').forEach(function (b) {
+  b.onclick = function () { LANG = b.getAttribute('data-l'); render(); };
+});
+document.querySelectorAll('#per span').forEach(function (s) {
+  s.onclick = function () { setP(s.dataset.p); };
+});
+render();
+</script>
+</body>
+</html>
